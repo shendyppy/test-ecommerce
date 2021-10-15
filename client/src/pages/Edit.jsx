@@ -1,23 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import LoadingForm from "../components/LoadingForm";
 import Navbar from "../components/Navbar";
-import { addItem } from "../stores/items/action";
 
-function Add() {
+import { editItem, fetchItemByID, fetchItems } from "../stores/items/action";
+
+function Edit() {
 	const dispatch = useDispatch();
 	const history = useHistory();
+	const { id } = useParams();
+
+	const { itemDetail, loadingEdit } = useSelector((state) => state.item);
 
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
+	const [price, setPrice] = useState(0);
 
-	const [price, setPrice] = useState("");
+	useEffect(() => {
+		dispatch(fetchItemByID(id));
+	}, [dispatch, id]);
 
-	const { loadingAdd } = useSelector((state) => state.item);
+	useEffect(() => {
+		setName(itemDetail?.name);
+		setDescription(itemDetail?.description);
+		setPrice(itemDetail?.price);
+	}, [itemDetail]);
 
 	const forName = (e) => {
 		e.preventDefault();
@@ -38,24 +48,26 @@ function Add() {
 		history.push("/home");
 	};
 
-	const handleAddItem = (e) => {
+	const handleEditItem = (e) => {
 		e.preventDefault();
 		const payload = {
 			name,
 			description,
+
 			price,
 		};
 
 		if (
 			payload.name === "" ||
 			payload.description === "" ||
-			payload.price === ""
+			payload.price === 0
 		) {
 			return toast.error("Please fill all the field!");
 		} else if (payload.price < 10000) {
 			return toast.error("Minimum price of the price is IDR 10.000");
 		} else {
-			dispatch(addItem(payload));
+			dispatch(editItem(id, payload));
+			dispatch(fetchItems());
 			return toast.success("Thank you for your contribution!");
 		}
 	};
@@ -81,7 +93,7 @@ function Add() {
 							className="mb-5 text-3xl font-bold"
 							style={{ color: "#171a21" }}
 						>
-							Add a New Item
+							Edit Your Item
 						</h2>
 					</div>
 					<div className="text-right">
@@ -111,7 +123,7 @@ function Add() {
 					}}
 				>
 					<div className="m-8">
-						<form action="" type="submit" onSubmit={handleAddItem}>
+						<form action="" type="submit" onSubmit={handleEditItem}>
 							<div className="form-control mt-2">
 								<label className="label">
 									<span className="label-text" style={{ color: "black" }}>
@@ -146,20 +158,20 @@ function Add() {
 									</span>
 								</label>
 								<input
-									type="number"
 									className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none"
+									type="number"
 									onChange={forPrice}
 									value={price}
 								/>
 							</div>
 
-							{loadingAdd ? (
+							{loadingEdit ? (
 								<LoadingForm />
 							) : (
 								<div className="form-control mt-6 mb-3">
 									<input
 										type="submit"
-										value="Adding New Item!"
+										value="Editing Your Item!"
 										className="btn"
 										style={{ backgroundColor: "#69DADB", color: "#white" }}
 									/>
@@ -173,4 +185,4 @@ function Add() {
 	);
 }
 
-export default Add;
+export default Edit;

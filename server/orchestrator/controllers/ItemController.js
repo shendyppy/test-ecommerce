@@ -20,9 +20,11 @@ class ItemController {
 	static async getAll(req, res, next) {
 		try {
 			const output = await itemsAPI.get("/");
+			console.log(output);
 
-			res.status(200).json(output);
+			res.status(200).json(output.data);
 		} catch (err) {
+			console.log(err);
 			next(err);
 		}
 	}
@@ -30,7 +32,7 @@ class ItemController {
 	static async getByID(req, res, next) {
 		try {
 			const id = +req.params.id;
-			const output = await itemsAPI.get(`${id}`);
+			const output = await itemsAPI.get(`/${id}`);
 
 			if (!output) {
 				throw {
@@ -55,7 +57,7 @@ class ItemController {
 				price: req.body.price,
 				UserId: req.body.UserId,
 			};
-			const output = await itemsAPI.put(`${id}`, data);
+			const output = await itemsAPI.put(`/${id}`, data);
 
 			if (!output) {
 				throw {
@@ -74,7 +76,7 @@ class ItemController {
 	static async delete(req, res) {
 		try {
 			const id = +req.params.id;
-			const output = await itemsAPI.delete(`${id}`);
+			const output = await itemsAPI.delete(`/${id}`);
 
 			if (!output) {
 				throw {
