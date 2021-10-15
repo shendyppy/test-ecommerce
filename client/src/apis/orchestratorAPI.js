@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const orchestratorAPI = axios.create({
-	baseURL: "http://localhost:4000/",
+const itemAPI = axios.create({
+	baseURL: "http://localhost:4001/items",
 });
 
-export default orchestratorAPI;
+export default itemAPI;
